@@ -72,6 +72,13 @@ for i in range(2):
 
 ![Screenshot 2024-09-06 at 4 42 50 PM](https://github.com/user-attachments/assets/e912e304-2853-4048-9394-f591b9a91071)
 
+# Technologies
+
+- pandas
+- selenium
+- re
+- tableau
+- sql
 
 
 
