@@ -1,0 +1,258 @@
+# Multivitamins
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import time
+import pandas as pd
+from random import randint
+from datetime import datetime
+
+
+
+# 重置列的最大寬度為預設值
+pd.reset_option('display.max_colwidth')
+
+# 建立 Chrome 選項
+chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument("--disable-notifications")  # 禁用通知
+
+# 建立 Chrome WebDriver 对象
+driver = webdriver.Chrome(options=chrome_options)
+
+url = "https://www.watsons.com.hk/zh-hk/%E5%81%A5%E5%BA%B7%E7%94%A2%E5%93%81/%E7%B6%9C%E5%90%88%E7%B6%AD%E4%BB%96%E5%91%BD/c/040313?pageSize=64&currentPage=0"
+
+
+theurl = []
+for i in range(2):
+    # 去到你想要的网页
+    driver.get(url)
+    
+    geturl = driver.find_elements(By.XPATH, "//h2/a[@class='ClickSearchResultEvent_Class gtmAlink']")
+    for j in geturl:
+        # 即时获取属性值并添加到 theurl 列表
+        theurl.append(j.get_attribute('href'))
+        
+    time.sleep(55)
+    
+    # 将 URL 的 currentPage 参数递增
+    current_page = int(url.split("currentPage=")[1]) + 1
+    url = url.replace("currentPage=" + str(current_page - 1), "currentPage=" + str(current_page))
+
+product_code_list = []
+brand_list = []
+title_list = []
+price_list = []
+country_list = []
+sold_list = []
+promotion_list = []
+original_price_list = []
+rating_list = []
+benefit_list = []
+ingredient_list = []
+only_w_list = []
+consider_list = []
+comment_list = []
+URL_list =[]
+
+
+
+for page in range(0, len(theurl)):
+    print('第 '+ str(page) + ' 個商品')
+    # 儲存網址
+    page_url = theurl[page]
+
+    # Add URL to the 'URL' list
+    URL_list.append(page_url)
+
+    # 去到你想要的網頁
+    driver.get(page_url)
+    time.sleep(randint(7, 15))
+    wait = WebDriverWait(driver, 25)  # 最多等待 10 秒
+
+
+    # Product code
+    try:
+        product_code_element = driver.find_element(By.XPATH, "//div[@class='value']")
+        product_code = product_code_element.text
+        product_code_list.append(product_code)
+    except NoSuchElementException:
+        product_code_list.append("N/A")  # 或其他值，表示找不到該元素
+
+    # 品牌名稱
+    try:
+        brand_element = driver.find_element(By.XPATH, "//h2[@class='product-brand']")
+        brand = brand_element.text
+        brand_list.append(brand)
+    except NoSuchElementException:
+        brand_list.append("N/A")  # 或其他值，表示找不到該元素
+
+    # 商品名稱
+    title_element = driver.find_element(By.XPATH, "//div[@class='product-name']")
+    title = title_element.text
+    title_list.append(title)
+    
+    # Price
+    price_elements = driver.find_elements(By.XPATH, "//div[contains(@class, 'display-price')]")
+    getprice = None
+
+    if not price_elements:
+        price_elements = driver.find_elements(By.XPATH, "//div[contains(@class, 'recommended-retail-price')]")
+        
+        if not price_elements:
+            price_elements = driver.find_elements(By.XPATH, "//div[contains(@class, 'non-discount-display-price')]")
+            
+    for price_element in price_elements:
+        getprice = price_element.text
+        break
+
+    getprice = getprice.replace('HK$', '')  # 移除 "HK$"
+    getprice = getprice.split(' ')[0]  # 提取空格之前的部分
+    price_list.append(getprice)
+
+
+    # Original Price
+    original_price_elements = driver.find_elements(By.XPATH, "//div[contains(@class, 'non-discount-display-price')]")
+    getoriginalprice = None
+
+    if not original_price_elements:
+        original_price_elements = driver.find_elements(By.XPATH, "//div[contains(@class, 'recommended-retail-price')]")
+        
+        if not original_price_elements:
+            original_price_elements = driver.find_elements(By.XPATH, "//div[contains(@class, 'display-price')]")
+            
+    for original_price_element in original_price_elements:
+        getoriginalprice = original_price_element.text
+        break
+
+    getoriginalprice = getoriginalprice.replace('RRP HK$','')
+    getoriginalprice = getoriginalprice.replace('HK$','')
+    getoriginalprice = getoriginalprice.split(' ')[0]
+    original_price_list.append(getoriginalprice) 
+
+
+
+    try:
+        country_element = driver.find_element(By.XPATH, "//div[@class='ng-tns-c2652604631-1 ng-star-inserted']")
+        country = country_element.text
+        # 提取原產地資訊
+        start_index = country.find("原產地") + 4  # 找到 "原產地" 字串的索引並加上 4，以跳過冒號和空格
+        origin = country[start_index:]
+        # 提取只有國家名稱的部分
+        origin = origin.split('\n')[0]  # Extract the first element after splitting on '\n'
+        country_list.append(origin)
+    except NoSuchElementException:
+        country_list.append("N/A")  # 如果找不到元素，将 "N/A" 添加到 country_list 中
+
+
+    # Sold
+    try:
+        sold_element = driver.find_element(By.XPATH, "//div[@class='social-proof ng-star-inserted']")
+        sold = sold_element.text
+        sold = sold.replace('售出','')
+        sold = sold.split('+件')[0]
+        sold = sold.split('件')[0]
+        sold = sold.replace('萬','0000')
+    except NoSuchElementException:
+        sold = "N/A"  # 或其他值，表示找不到該元素
+
+    sold_list.append(sold)
+
+
+    # Promotion
+    try:
+        promotion_element = driver.find_element(By.XPATH, "//div[@class='promotion-group-wrapper ng-tns-c209238244-2']")
+        promotion = promotion_element.text
+        promotion = promotion.replace('\n','; ')
+        promotion_list.append(promotion)
+    except NoSuchElementException:
+        promotion_list.append('/')
+
+
+    #Review Rating
+    rating_element = driver.find_element(By.XPATH, "//div[contains(@class, 'reviewRating ng-star-inserted')]//div[contains(@class, 'count')]")    
+    rating = rating_element.text
+    rating_list.append(rating)
+
+
+    # Benefit
+    try:
+        # 提取"優點"信息
+        benefit_element = driver.find_element(By.XPATH, "//div[@class='ng-tns-c2652604631-1 ng-star-inserted']")
+        benefit = benefit_element.text
+
+        start_index = benefit.find("優點") + 3  # 找到 "優點" 字符串的索引并加上 3，以跳过冒号和换行符
+        end_index = benefit.find("產品用法")  # 找到 "產品用法" 字符串的索引
+        benefit_text = benefit[start_index:end_index]
+        benefit_text = benefit_text.replace('\n', '; ')
+        benefit_list.append(benefit_text)
+    except NoSuchElementException:
+        benefit_list.append("N/A")  # 如果找不到元素，将 "N/A" 添加到 benefit_list 中
+
+
+    # Ingredient
+    try:
+        # 提取"成分組合"信息
+        ingredient_element = driver.find_element(By.XPATH, "//div[@class='ng-tns-c2652604631-1 ng-star-inserted']")
+        ingredient = ingredient_element.text
+
+        start_index = ingredient.find("成分組合") + 5  # 找到 "成分組合" 字符串的索引并加上 5，以跳过冒号和换行符
+        end_index = ingredient.find("送貨詳情")  # 找到 "送貨詳情" 字符串的索引
+        ingredient_text = ingredient[start_index:end_index]
+        ingredient_text = ingredient_text.replace('\n', '')
+        ingredient_list.append(ingredient_text)
+    except NoSuchElementException:
+        ingredient_list.append("N/A")  # 如果找不到元素，将 "N/A" 添加到 ingredient_list 
+
+
+
+    # Only at Watsons
+    only_w_element = driver.find_element(By.XPATH, "//div[@class='product-gallery ng-tns-c2197773092-0 ng-star-inserted']")
+    img_elements = only_w_element.find_elements(By.XPATH, ".//img")
+    # 檢查是否找到符合條件的圖片元素
+    found_img_elements = [img for img in img_elements if 'ng-tns-c2197773092-0' in img.get_attribute("class")]
+
+    if found_img_elements:
+        only_w_list.append('Yes')
+    else:
+        only_w_list.append('/')
+
+
+    # Considering 
+    try:
+        consider_element = driver.find_element(By.XPATH, "//div[@class='ins-editable ins-element-editable ins-dynamic-text-area ins-dynamic-attribute-popup']")
+        consider = consider_element.text
+        consider = consider.replace('剛剛有','')
+        consider = consider.replace('立即搶購！','')
+        consider = consider.split('人在瀏覽此商品')[0]
+        consider = consider.split('人正在考慮此商品')[0]
+        consider_list.append(consider)
+    except NoSuchElementException:
+        consider_list.append('/')
+
+
+    # Comment
+    comment_element = driver.find_element(By.XPATH, "//div[@class='review-num ng-star-inserted']")
+    comment = comment_element.text
+    comment = comment.replace('評論','')
+    comment_list.append(comment)
+    
+
+
+
+df = pd.DataFrame({'Product_Code': product_code_list,'Brand': brand_list, "Product_name": title_list,"Price": price_list,'Original Price': original_price_list,
+                   'Promotion': promotion_list, "Country": country_list,'Benefit': benefit_list, 'Ingredient': ingredient_list,
+                   'Sold+': sold_list, 'Rating': rating_list, 'Only_W': only_w_list,'Considering': consider_list,'Comment': comment_list, 
+                   'URL': URL_list
+                   
+                   })
+display(df)
+
+# 獲取當前日期和時間
+current_datetime = datetime.now().strftime("%Y%m%d_%H%M")
+
+# 生成CSV文件名
+csv_filename = f"w_multivitamins_{current_datetime}.csv"
+
+df.to_csv(csv_filename, index=False, encoding='utf-8-sig')
