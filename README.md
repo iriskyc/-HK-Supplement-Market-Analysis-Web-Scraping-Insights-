@@ -65,8 +65,7 @@ for i in range(2):
 ### HKWatsons 
 ![WhatsApp Image 2024-09-04 at 20 51 47](https://github.com/user-attachments/assets/7bb63ea1-1b7f-4823-bd9e-db5ed68e3709)
 
-## Tableau
-### Business Analysis
+# Tableau (Business Analysis)
 ![Screenshot 2024-09-08 at 2 39 34 PM](https://github.com/user-attachments/assets/cc803f44-6967-4fe1-8ce7-5838ff8a0a9e)
 
 ### The Contrast: HKTVmall vs. HKWatsons - HKWatsons' Exclusive Brands
