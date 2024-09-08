@@ -23,28 +23,28 @@ import pandas as pd
 from random import randint
 from datetime import datetime
 
-# 建立 Chrome 選項
+# Create Chrome options
 chrome_options = webdriver.ChromeOptions()
-chrome_options.add_argument("--disable-notifications")  # 禁用通知
+chrome_options.add_argument("--disable-notifications")  # Disable notifications
 
-# 建立 Chrome WebDriver 对象
+# Create Chrome WebDriver object
 driver = webdriver.Chrome(options=chrome_options)
 
 url = "https://www.watsons.com.hk/zh-hk/%E5%81%A5%E5%BA%B7%E7%94%A2%E5%93%81/%E7%B6%9C%E5%90%88%E7%B6%AD%E4%BB%96%E5%91%BD/c/040313?pageSize=64&currentPage=0"
 
 theurl = []
 for i in range(2):
-    # 去到你想要的网页
+    # Go to the desired webpage
     driver.get(url)
     
     geturl = driver.find_elements(By.XPATH, "//h2/a[@class='ClickSearchResultEvent_Class gtmAlink']")
     for j in geturl:
-        # 即时获取属性值并添加到 theurl 列表
+        # Immediately get the attribute value and add it to the theurl list
         theurl.append(j.get_attribute('href'))
         
     time.sleep(55)
     
-    # 将 URL 的 currentPage 参数递增
+    # Increment the currentPage parameter of the URL
     current_page = int(url.split("currentPage=")[1]) + 1
     url = url.replace("currentPage=" + str(current_page - 1), "currentPage=" + str(current_page))
 ```
@@ -67,19 +67,27 @@ for i in range(2):
 
 ## Tableau
 ### Business Analysis
-![Screenshot 2024-09-06 at 4 43 58 PM](https://github.com/user-attachments/assets/cf780a51-ecc4-4f4a-9ff8-d6b68ef2c389)
+![Screenshot 2024-09-08 at 2 39 34 PM](https://github.com/user-attachments/assets/cc803f44-6967-4fe1-8ce7-5838ff8a0a9e)
+
+### The Contrast: HKTVmall vs. HKWatsons - HKWatsons' Exclusive Brands
+In this image, it is evident that the exclusive supplement brands at HKWatsons represent 20% of the sales volume. Conversely, HKTV does not offer exclusive supplement brands.
 
 
 ![Screenshot 2024-09-06 at 4 42 50 PM](https://github.com/user-attachments/assets/e912e304-2853-4048-9394-f591b9a91071)
 
+### Sales Factor: Diseases
+
+At Watsons, Yiling's sales figures are exceptionally high. This surge is attributed to one of Yiling's most renowned supplements, the 'Lotus Flower Clear Capsules,' whose sales have escalated due to the effects of COVID-19."
+
 # Technologies
-
-- pandas
-- selenium
-- re
-- tableau
-- sql
-
-
+- Pandas
+- Selenium
+- RE
+- SQL
+- Tableau
+  
+# Reference
+- https://www.hktvmall.com/hktv/zh/
+- https://www.watsons.com.hk/zh-hk/
 
 
